@@ -143,6 +143,18 @@
   @keyframes rotHint { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
   .rotate-screen h2 { font-size: clamp(18px, 5vw, 26px); color: #FFD700; }
   .rotate-screen p { font-size: clamp(13px, 3.4vw, 16px); color: #ccc; max-width: 420px; line-height: 1.5; }
+  /* низкие экраны (телефон в ландшафте) — уплотняем оверлеи, чтобы все кнопки были видны */
+  @media (max-height: 460px) {
+    .overlay { padding: 8px 14px; gap: 6px; }
+    .overlay h1 { font-size: clamp(17px, 4.6vh, 26px); }
+    .overlay h2 { font-size: clamp(12px, 3.2vh, 18px); }
+    .overlay p { font-size: clamp(10px, 2.5vh, 14px); }
+    #startBtn { padding: 9px 34px; font-size: clamp(15px, 4vh, 22px); border-radius: 10px; }
+    .btn { padding: 7px 16px; font-size: clamp(11px, 3vh, 15px); }
+    .help-box { max-height: 44vh; padding: 8px 12px; }
+    .help-box h3 { margin: 6px 0 2px; }
+    .score-big { font-size: clamp(22px, 8vh, 40px); }
+  }
 </style>
 </head>
 <body>
@@ -156,7 +168,7 @@
   </div>
 
   <div class="overlay" id="startScreen">
-    <h1>🏃 Подслушано в Ачинске</h1>
+    <h1>🏃 БЕГАЧ</h1>
     <h2>Беги, ачинец, беги!</h2>
     <p id="startHighScore" style="color:#FFD700;font-weight:700;">Рекорд: 0</p>
     <p id="startWallet" style="color:#7FF3FF;font-weight:700;">💰 Монеты: 0</p>
@@ -171,7 +183,7 @@
     <h1>❓ Как играть</h1>
     <div class="help-box">
       <h3>🎯 Цель</h3>
-      <p>Ты — ачинец, который бежит по родному городу под сибирскими сопками. Беги как можно дальше, набирай очки и собирай монеты. Мир проходит шесть фаз суток, и каждая следующая сложнее.</p>
+      <p>Ты — бегач, который мчит по родному Ачинску под сибирскими сопками. Беги как можно дальше, набирай очки и собирай монеты. Мир проходит шесть фаз суток, и каждая следующая сложнее.</p>
       <h3>🎮 Управление</h3>
       <ul>
         <li><b>Пробел / ↑ / W / клик / тап</b> — прыжок;</li>
@@ -188,14 +200,14 @@
         <tr><td>6:00 Сумерки</td><td>двойные группы, зажигаются окна, сердце</td></tr>
         <tr><td>9:00 Ночь</td><td>максимальный темп, только для закалённых</td></tr>
       </table>
-      <p>Группы препятствий всегда подобраны так, чтобы их можно было перелететь <b>одним прыжком</b>, а между группами остаётся безопасный коридор для приземления. Вороны никогда не вылетают в момент, когда тебе нужен вынужденный двойной прыжок через наземное препятствие.</p>
+      <p>Группы препятствий всегда подобраны так, чтобы их можно было перелететь <b>одним прыжком</b>, а между группами и после дуг монет остаётся безопасный коридор для приземления. Вороны никогда не вылетают в момент, когда тебе нужен вынужденный двойной прыжок через наземное препятствие.</p>
       <h3>⚡ Бустеры</h3>
       <ul>
         <li>🧲 <b>Магнит</b> (8 с) — монеты сами летят к тебе;</li>
         <li>🛡 <b>Щит</b> (20 с) — спасает от одного удара и <b>не сбивает комбо</b>;</li>
         <li>⏱ <b>Замедление</b> (5 с) — мир замедляется; появляется только на высокой скорости; «впритирку» в замедлении даёт ×2;</li>
         <li>✖2 <b>Удвоение</b> (8 с) — бонусные очки удваиваются, складывается с комбо;</li>
-        <li>❤ <b>Сердце</b> — редкое: бывает только в Сумерках и Ночью, только если у тебя <b>1 жизнь</b>, и не чаще раза в 50 секунд. Даёт +1 жизнь (максимум 3).</li>
+        <li>❤ <b>Сердце</b> — редкое: только в Сумерках и Ночью, только при <b>1 жизни</b>, не чаще раза в 50 секунд. Даёт +1 жизнь (максимум 3).</li>
       </ul>
       <h3>🔥 Комбо-множитель</h3>
       <ul>
@@ -233,7 +245,7 @@
 
   <div class="overlay hidden" id="pauseScreen">
     <h1>⏸ Пауза</h1>
-    <p>Отдохни, ачинец. Вороны и собаки подождут.</p>
+    <p>Отдохни, бегач. Вороны и собаки подождут.</p>
     <button class="btn" id="resumeBtn">Продолжить</button>
   </div>
 
@@ -295,6 +307,7 @@
   var DEATH_DURATION = 1600, MAX_PARTICLES = 240;
   var PLAYER_X = 180, PLAYER_W = 50, PLAYER_H = 75;
   var SPR_SCALE = 2;
+  var FIRST_SPAWN_DELAY = 2600;   // пауза перед первым препятствием (стартовая дуга монет безопасна)
 
   /* ================= ФАЗЫ СЛОЖНОСТИ (сутки) ================= */
   var PHASES = [
@@ -394,7 +407,7 @@
     { id: 'moose', name: 'Лось Ачинска', icon: '🦌', price: 400,
       jacket: '#E8A462', jacketDark: '#8A5A2A', pants: '#5A4030', shoes: '#3A2A1A',
       hat: '#8B5A2A', hatTrim: '#E8D8B8', hatStyle: 'antlers' },
-    { id: 'gold', name: 'Золотой ачинец', icon: '👑', price: 700,
+    { id: 'gold', name: 'Золотой бегач', icon: '👑', price: 700,
       jacket: '#D4AF37', jacketDark: '#8A6E14', pants: '#2C2C2C', shoes: '#D4AF37',
       hat: '#D4AF37', hatTrim: '#FFF2B0', hatStyle: 'cap' }
   ];
@@ -532,7 +545,18 @@
     deathT: 0, deathRot: 0, deathDX: 0, deathLanded: false
   };
 
-  var scaleFactorX = 1, scaleFactorY = 1, dpr = 1;
+  var scaleFactorX = 1, scaleFactorY = 1, dpr = 1, viewScale = 1;
+
+  /* ---------- РАЗМЕРЫ: честный 16:9 в видимой области ---------- */
+  var WRAP = document.getElementById('gameWrapper');
+  function fitWrapper() {
+    var vv = window.visualViewport;
+    var h = vv && isFinite(vv.height) && vv.height > 50 ? vv.height : window.innerHeight;
+    var w = window.innerWidth;
+    if (!isFinite(w) || w < 50) w = document.documentElement.clientWidth;
+    var target = Math.min(w, h * 16 / 9, 960);
+    if (isFinite(target) && target > 2) WRAP.style.width = target + 'px';
+  }
 
   function resizeCanvas() {
     var rect = CANVAS.parentElement.getBoundingClientRect();
@@ -542,40 +566,11 @@
     CANVAS.height = Math.round(rect.height * dpr);
     scaleFactorX = CANVAS.width / VW;
     scaleFactorY = CANVAS.height / VH;
+    viewScale = rect.width / VW;   // CSS-масштаб (без dpr) — для решений о компактном HUD
     CANVAS.style.width = rect.width + 'px';
     CANVAS.style.height = rect.height + 'px';
     CTX.setTransform(scaleFactorX, 0, 0, scaleFactorY, 0, 0);
   }
-
-  /* ================= РАСЧЁТ СЛОЖНОСТИ ================= */
-  var diffCache = { phase: 0 };
-  function computeDifficulty(t) {
-    var i = 0, k;
-    for (k = 0; k < PHASES.length; k++) if (t >= PHASES[k].t) i = k;
-    var cur = PHASES[i], nxt = PHASES[i + 1];
-    var f = nxt ? clamp((t - cur.t) / (nxt.t - cur.t), 0, 1) : 1;
-    f = smoothstep(f);
-    function mix(a, b) { return nxt ? a + (b - a) * f : a; }
-    diffCache.phase = i;
-    diffCache.name = cur.name;
-    diffCache.color = cur.color;
-    diffCache.hint = cur.hint;
-    diffCache.speed = mix(cur.speed, nxt ? nxt.speed : cur.speed);
-    diffCache.spawn = mix(cur.spawn, nxt ? nxt.spawn : cur.spawn);
-    diffCache.comboPat = mix(cur.comboPat, nxt ? nxt.comboPat : cur.comboPat);
-    diffCache.tr = mix(cur.tr, nxt ? nxt.tr : cur.tr);
-    diffCache.tg = mix(cur.tg, nxt ? nxt.tg : cur.tg);
-    diffCache.tb = mix(cur.tb, nxt ? nxt.tb : cur.tb);
-    diffCache.ta = mix(cur.ta, nxt ? nxt.ta : cur.ta);
-    diffCache.night = mix(cur.night, nxt ? nxt.night : cur.night);
-    return diffCache;
-  }
-  function nightFactor() { return state.diff ? clamp(state.diff.night, 0, 1) : 0; }
-  function windowLights() { return clamp((nightFactor() - 0.35) / 0.65, 0, 1); }
-  function scoreMult() { return state.comboMult * (state.pupActive.double > 0 ? 2 : 1); }
-  function slowActive() { return state.pupActive.slow > 0; }
-  function jumpDist() { return JUMP_AIR_FRAMES * state.speed; }
-  function maxGroupSpan() { return Math.max(120, jumpDist() - PLAYER_W - 30); }
 
   /* ---------- ОРИЕНТАЦИЯ / ПОДСКАЗКА ПОВОРОТА ---------- */
   var rotateDismissed = false;
@@ -599,13 +594,13 @@
     var el = $('rotateScreen');
     if (el) el.classList.add('hidden');
   }
+  function onViewportChange() { fitWrapper(); resizeCanvas(); maybeShowRotate(); }
 
-  window.addEventListener('resize', function () { resizeCanvas(); maybeShowRotate(); });
-  window.addEventListener('orientationchange', function () {
-    setTimeout(function () { resizeCanvas(); maybeShowRotate(); }, 120);
-  });
+  window.addEventListener('resize', onViewportChange);
+  window.addEventListener('orientationchange', function () { setTimeout(onViewportChange, 120); });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', function () { resizeCanvas(); });
+    window.visualViewport.addEventListener('resize', onViewportChange);
+    window.visualViewport.addEventListener('scroll', onViewportChange);
   }
 
   /* ---------- СОХРАНЕНИЯ ---------- */
@@ -781,6 +776,36 @@
   });
   window.addEventListener('pagehide', function () { if (walletDirty) saveWallet(); });
 
+  /* ---------- СЛОЖНОСТЬ ---------- */
+  var diffCache = { phase: 0 };
+  function computeDifficulty(t) {
+    var i = 0, k;
+    for (k = 0; k < PHASES.length; k++) if (t >= PHASES[k].t) i = k;
+    var cur = PHASES[i], nxt = PHASES[i + 1];
+    var f = nxt ? clamp((t - cur.t) / (nxt.t - cur.t), 0, 1) : 1;
+    f = smoothstep(f);
+    function mix(a, b) { return nxt ? a + (b - a) * f : a; }
+    diffCache.phase = i;
+    diffCache.name = cur.name;
+    diffCache.color = cur.color;
+    diffCache.hint = cur.hint;
+    diffCache.speed = mix(cur.speed, nxt ? nxt.speed : cur.speed);
+    diffCache.spawn = mix(cur.spawn, nxt ? nxt.spawn : cur.spawn);
+    diffCache.comboPat = mix(cur.comboPat, nxt ? nxt.comboPat : cur.comboPat);
+    diffCache.tr = mix(cur.tr, nxt ? nxt.tr : cur.tr);
+    diffCache.tg = mix(cur.tg, nxt ? nxt.tg : cur.tg);
+    diffCache.tb = mix(cur.tb, nxt ? nxt.tb : cur.tb);
+    diffCache.ta = mix(cur.ta, nxt ? nxt.ta : cur.ta);
+    diffCache.night = mix(cur.night, nxt ? nxt.night : cur.night);
+    return diffCache;
+  }
+  function nightFactor() { return state.diff ? clamp(state.diff.night, 0, 1) : 0; }
+  function windowLights() { return clamp((nightFactor() - 0.35) / 0.65, 0, 1); }
+  function scoreMult() { return state.comboMult * (state.pupActive.double > 0 ? 2 : 1); }
+  function slowActive() { return state.pupActive.slow > 0; }
+  function jumpDist() { return JUMP_AIR_FRAMES * state.speed; }
+  function maxGroupSpan() { return Math.max(120, jumpDist() - PLAYER_W - 30); }
+
   /* ---------- КОМБО ---------- */
   function comboMultFor(n) {
     var m = 1;
@@ -926,8 +951,9 @@
     state.player.y = GROUND_Y - PLAYER_H; state.player.vy = 0;
     state.player.jumpsLeft = 2; state.player.onGround = true;
     state.player.runFrame = 0; state.player.invincible = 0;
-    state.spawnTimer = 0;
-    spawnCoinArc(VW + 200, GROUND_Y - 180, 6);
+    // безопасное начало: низкая дуга на одинарном прыжке + задержка первого препятствия
+    state.spawnTimer = -FIRST_SPAWN_DELAY;
+    spawnCoinArc(VW + 200, GROUND_Y - 110, 6, 60);
     pauseBtn.textContent = '⏸';
     showPauseButton(true);
     $('pauseScreen').classList.add('hidden');
@@ -962,7 +988,7 @@
     hint.style.opacity = '1'; hint.style.display = 'block';
     if (hintTimer) clearTimeout(hintTimer);
     hintTimer = setTimeout(function () { hint.style.opacity = '0'; }, 4000);
-    resetGame(); resizeCanvas();
+    resetGame(); fitWrapper(); resizeCanvas();
     maybeShowRotate();
     SFX.unlock(); SFX.start();
   }
@@ -1004,7 +1030,7 @@
   $('shareBtn').addEventListener('click', function (e) {
     e.preventDefault(); e.stopPropagation(); SFX.ui();
     var text = '🏃 Я набрал ' + state.score + ' очков, собрал ' + state.coins + ' монет и добежал до фазы «' +
-      state.diff.name + '» в игре "Ачинск Раннер" от @achpod! Попробуй побить мой рекорд!';
+      state.diff.name + '» в игре "БЕГАЧ" от @achpod! Попробуй побить мой рекорд!';
     function fallback() {
       var ok = false;
       try {
@@ -1026,7 +1052,7 @@
     } else fallback();
   });
 
-  /* ---------- СПАВН ПРЕПЯТСТВИЙ ---------- */
+  /* ---------- СПАВН ПРЕПЯТСТВИЙ (честная геометрия) ---------- */
   function nmInit(o) { o.minGap = -1; o.minClear = -1; o.nmSkip = false; o.nmAwarded = false; o.inZone = false; o.forcesDouble = false; return o; }
 
   var OB_TYPES = ['dog', 'pothole', 'cone', 'scooter', 'trash'];
@@ -1046,23 +1072,49 @@
     return o;
   }
 
+  // зона, в которую игрок может приземлиться после воздушной активности (дуга/бустер/кристалл)
+  function landingKeepOut(startX, groupSpan) {
+    var land = jumpDist() + 140;
+    var i, k;
+    for (i = 0; i < state.coinArcs.length; i++) {
+      var a = state.coinArcs[i], a0 = -1e9, a1 = -1e9, found = false;
+      for (k = 0; k < a.length; k++) {
+        if (!a[k].collected) { if (!found) { a0 = a[k].x; found = true; } a1 = a[k].x; }
+      }
+      if (found && startX + groupSpan > a0 + 120 && startX < a1 + land) startX = a1 + land;
+    }
+    for (i = 0; i < state.pups.length; i++) {
+      var u = state.pups[i];
+      if (!u.taken && startX + groupSpan > u.x - 60 && startX < u.x + land) startX = u.x + land;
+    }
+    for (i = 0; i < state.diamonds.length; i++) {
+      var d = state.diamonds[i];
+      if (!d.collected && startX + groupSpan > d.x - 60 && startX < d.x + land) startX = d.x + land;
+    }
+    return startX;
+  }
+
   function spawnObstacle() {
     var diff = state.diff;
-    var span = maxGroupSpan();
+    var spanMax = maxGroupSpan();
     var type = pickObstacleType();
     var count = 1;
     if (Math.random() < diff.comboPat) count = (diff.phase >= 4 && Math.random() < 0.25) ? 3 : 2;
 
     var spacing = 0;
-    if (count > 1) spacing = Math.max(60, Math.min((span - 60) / (count - 1), span * 0.45));
+    if (count > 1) spacing = Math.max(60, Math.min((spanMax - 60) / (count - 1), spanMax * 0.45));
+    var groupSpan = spacing * (count - 1) + 60;
+
+    var startX = landingKeepOut(VW + 50, groupSpan);
 
     var lastType = null;
     for (var gi = 0; gi < count; gi++) {
       var tt = gi === 0 ? type : pickObstacleType();
       if (tt === 'pothole' && lastType === 'pothole') tt = 'dog';
-      state.obstacles.push(makeObstacle(tt, VW + 50 + gi * spacing));
+      state.obstacles.push(makeObstacle(tt, startX + gi * spacing));
       lastType = tt;
     }
+    return startX;
   }
 
   /* ---------- ВОРОНЫ ---------- */
@@ -1090,15 +1142,17 @@
   function spawnDiamond() {
     state.diamonds.push({ x: VW + 60, y: rand(GROUND_Y - 170, GROUND_Y - 130), spin: rand(0, TAU), collected: false });
   }
-  function spawnCoinArc(startX, peakY, count) {
+  function spawnCoinArc(startX, peakY, count, arcH) {
+    var ah = arcH == null ? 80 : arcH;
     var n = Math.max(1, count | 0), arc = [], spacing = 70, denom = n > 1 ? n - 1 : 1;
     for (var i = 0; i < n; i++) {
       var t = i / denom;
-      arc.push({ x: startX + t * spacing * denom, y: peakY - Math.sin(t * Math.PI) * 80, size: 22, collected: false, spin: rand(0, TAU) });
+      arc.push({ x: startX + t * spacing * denom, y: peakY - Math.sin(t * Math.PI) * ah, size: 22, collected: false, spin: rand(0, TAU) });
     }
     state.coinArcs.push(arc);
   }
-  function spawnRandomCoins() { spawnCoinArc(VW + 100, rand(GROUND_Y - 200, GROUND_Y - 100), randInt(3, 6)); }
+  // дуга-компаньон начинается у препятствия: головы монет берутся прыжком через него, хвост — после
+  function spawnRandomCoins(baseX) { spawnCoinArc(baseX - 40, rand(GROUND_Y - 200, GROUND_Y - 100), randInt(3, 6), 80); }
   function spawnBillboard() { state.billboards.push({ x: VW + 60, w: 226 }); }
   function spawnBusStop() { state.busStops.push({ x: VW + 80 }); }
   function spawnSnowman() { state.snowmen.push({ x: VW + 60, variant: randInt(0, 1) }); }
@@ -1137,6 +1191,7 @@
     }
   }
 
+  /* ---------- ШАГ СИМУЛЯЦИИ (фиксированные 60 Гц) ---------- */
   function update(dtMs) {
     if (state.mode !== 'playing') return;
     state.gameTime += dtMs;
@@ -1299,7 +1354,10 @@
       state.spawnTimer = 0;
       var last = state.obstacles.length ? state.obstacles[state.obstacles.length - 1] : null;
       var lastEnd = last ? (last.x + last.w) : -1e9;
-      if (!last || lastEnd < VW - gateGap) { spawnObstacle(); if (Math.random() < 0.5) spawnRandomCoins(); }
+      if (!last || lastEnd < VW - gateGap) {
+        var sx = spawnObstacle();
+        if (Math.random() < 0.5) spawnRandomCoins(sx);
+      }
     }
 
     var playerBox = { x: PLAYER_X + 8, y: p.y + 5, w: PLAYER_W - 16, h: PLAYER_H - 10 };
@@ -2152,7 +2210,7 @@
     C.translate(CX, by + bh - 20); C.rotate(-0.05);
     C.fillStyle = '#5A9E4B'; C.fillRect(-bw / 2 + 4, -15, bw - 8, 32);
     C.fillStyle = '#FFF'; C.font = 'bold 12px Arial';
-    C.fillText('ПОДСЛУШАНО', 0, -2); C.fillText('В АЧИНСКЕ', 0, 12);
+    C.fillText('БЕГАЧ', 0, -2); C.fillText('ПОДСЛУШАНО В АЧИНСКЕ', 0, 12);
     C.restore();
     C.textAlign = 'left';
     C.restore();
@@ -3337,7 +3395,7 @@
   }
 
   /* ---------- HUD (адаптивный) ---------- */
-  function compactMode() { return scaleFactorX < 0.85; }
+  function compactMode() { return viewScale < 0.85; }
   function hudLayout() {
     if (!compactMode()) {
       return {
@@ -3620,25 +3678,34 @@
     }
   }
 
+  /* ---------- ЦИКЛ: фиксированный шаг 60 Гц ---------- */
+  var FIXED = 1000 / 60;
+  var acc = 0;
+
+  function tick(dt) {
+    state.ambientTime += dt;
+    if (state.mode === 'start') {
+      state.gameTime = (state.gameTime + dt * 0.9) % (PHASES[PHASES.length - 1].t + 90000);
+      state.diff = computeDifficulty(state.gameTime);
+      state.worldOffset += 0.75;
+      state.groundOffset = mod(state.groundOffset + 0.75, 40);
+    }
+    update(dt);
+    if (state.mode === 'dying') updateDying(dt);
+    if (state.mode !== 'playing') flushWalletIfDue();
+  }
+
   function gameLoop(timestamp) {
     if (!lastTime) lastTime = timestamp;
     var dtMs = timestamp - lastTime;
     lastTime = timestamp;
     if (!isFinite(dtMs) || dtMs < 0) dtMs = 0;
-    if (dtMs > 50) dtMs = 50;
+    if (dtMs > 250) dtMs = 250;
 
-    state.ambientTime += dtMs;
-
-    if (state.mode === 'start') {
-      state.gameTime = (state.gameTime + dtMs * 0.9) % (PHASES[PHASES.length - 1].t + 90000);
-      state.diff = computeDifficulty(state.gameTime);
-      state.worldOffset += 0.75;
-      state.groundOffset = mod(state.groundOffset + 0.75, 40);
-    }
-
-    update(dtMs);
-    if (state.mode === 'dying') updateDying(dtMs);
-    if (state.mode !== 'playing') flushWalletIfDue();
+    acc += dtMs;
+    var steps = 0;
+    while (acc >= FIXED && steps < 6) { tick(FIXED); acc -= FIXED; steps++; }
+    if (steps === 6) acc = 0;   // защита от спирали после сильного фриза
 
     try {
       renderFrame();
@@ -3680,6 +3747,7 @@
       spritesOk = false;
       if (window.console) console.warn('Sprites disabled:', err);
     }
+    fitWrapper();
     resizeCanvas();
     maybeShowRotate();
     requestAnimationFrame(gameLoop);
