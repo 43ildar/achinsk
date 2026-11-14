@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>БЕГАЧ — Подслушано в Ачинске</title>
 
-<!-- VK Bridge: сначала локальный файл (для офлайн-сборки), затем CDN-копия.
-     Если локального index.umd.js нет на хостинге VK — подхватится CDN-версия.
-     Если заблокирован и CDN — ниже есть третий запасной источник (jsdelivr). -->
+<!-- VK Bridge: локальный файл + CDN-копия. Если index.umd.js не загружен на хостинг VK,
+     подхватится CDN-версия. Третий запасной источник догружается из JS. -->
 <script src="index.umd.js"></script>
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
@@ -176,11 +175,11 @@ align-items:center;justify-content:center;gap:14px;text-align:center;padding:24p
 .rotate-screen p{font-size:clamp(12px,3.4vw,16px);color:#ccc;max-width:420px;line-height:1.5}
 #bootError{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99;max-width:min(94vw,760px);
 background:linear-gradient(135deg,#7a1226,#3a0a14);border:1px solid rgba(255,120,140,.5);color:#ffe6ea;
-font:600 12px/1.5 'Segoe UI',Arial,sans-serif;padding:10px 14px;border-radius:10px;display:none;
+font:600 12px/1.55 'Segoe UI',Arial,sans-serif;padding:10px 14px;border-radius:10px;display:none;
 white-space:pre-wrap;word-break:break-word;box-shadow:0 10px 30px rgba(0,0,0,.6)}
 #bootError.show{display:block}
 #bootError b{color:#FFD700}
-#bootError button{margin-top:7px;background:#fff2;color:#fff;border:1px solid rgba(255,255,255,.4);
+#bootError button{margin-top:7px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.4);
 border-radius:7px;padding:4px 10px;font:700 11px 'Segoe UI',Arial,sans-serif;cursor:pointer}
 @media(max-height:470px){
 .overlay{padding:7px 12px;gap:5px}.overlay h1{font-size:clamp(15px,4.4vh,24px)}
@@ -307,22 +306,19 @@ border-radius:7px;padding:4px 10px;font:700 11px 'Segoe UI',Arial,sans-serif;cur
 (function(){
 'use strict';
 /* ================= ДИАГНОСТИКА ЗАПУСКА ================= */
-var bootErrorEl=document.getElementById('bootError');
 var bootErrors=[];
 function showFatal(title,detail){
 try{
-bootErrors.push(title+(detail?(': '+detail):''));
-if(!bootErrorEl)return;
-bootErrorEl.innerHTML='<b>⚠ '+String(title).replace(/[<>&]/g,'')+'</b>\n'+
-String(detail||'').replace(/[<>&]/g,'')+'\n<br><button id="bootErrCopy">Скопировать</button> '+
-'<button id="bootErrHide">Скрыть</button>';
-bootErrorEl.classList.add('show');
+bootErrors.push(String(title)+(detail?(': '+detail):''));
+var el=document.getElementById('bootError');if(!el)return;
+el.innerHTML='<b>⚠ '+String(title).replace(/[<>&]/g,'')+'</b>\n'+String(detail||'').replace(/[<>&]/g,'')+
+'\n<br><button id="bootErrCopy">Скопировать</button> <button id="bootErrHide">Скрыть</button>';
+el.classList.add('show');
 var cp=document.getElementById('bootErrCopy'),hd=document.getElementById('bootErrHide');
-if(cp)cp.onclick=function(){try{
-var ta=document.createElement('textarea');ta.value=bootErrors.join('\n');ta.style.position='fixed';ta.style.top='-999px';
-document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-cp.textContent='Скопировано';}catch(e){}};
-if(hd)hd.onclick=function(){bootErrorEl.classList.remove('show');};
+if(cp)cp.onclick=function(){try{var ta=document.createElement('textarea');ta.value=bootErrors.join('\n');
+ta.style.position='fixed';ta.style.top='-999px';document.body.appendChild(ta);ta.select();
+document.execCommand('copy');document.body.removeChild(ta);cp.textContent='Скопировано';}catch(e){}};
+if(hd)hd.onclick=function(){el.classList.remove('show');};
 }catch(e){}
 }
 window.addEventListener('error',function(e){
@@ -335,9 +331,9 @@ showFatal('Необработанный promise',e&&e.reason?(e.reason.message||
 
 /* ================= БАЗА ================= */
 var CANVAS=document.getElementById('gameCanvas');
-if(!CANVAS){showFatal('Canvas не найден','Проверь разметку');return;}
+if(!CANVAS){showFatal('Canvas не найден');return;}
 var CTX=CANVAS.getContext('2d');
-if(!CTX){showFatal('2D-контекст недоступен','WebView не поддерживает canvas 2d');return;}
+if(!CTX){showFatal('2D-контекст недоступен');return;}
 var WRAP=document.getElementById('gameWrapper');
 var C=CTX,BASE_Y=0,TAU=Math.PI*2,VW=960,VH=540,GROUND_Y=VH-80,CAR_LANE_Y=VH-6;BASE_Y=GROUND_Y;
 var GRAVITY=.7,JUMP_VELOCITY=-13,DOUBLE_JUMP_VELOCITY=-11.5,BASE_SPEED=6,MAX_SPEED=14.2,JUMP_AIR_FRAMES=37;
@@ -350,6 +346,8 @@ var COIN_SCORE=25,DIAMOND_SCORE=250,WALLET_FLUSH_MS=1200,CROW_START_TIME=100000,
 var CROW_BASE_INTERVAL=24000,CROW_MIN_INTERVAL=10500,CROW_MAX_HOLD=8000;
 var CLOUD_DEBOUNCE=4000,CLOUD_RETRY=45000,START_WAIT=2200;
 var BRIDGE_SOURCES=['index.umd.js','https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js','https://cdn.jsdelivr.net/npm/@vkontakte/vk-bridge/dist/browser.min.js'];
+/* Укажите HTTPS-адрес своего бэкенда, чтобы включить общий топ:
+   var GAME_API='https://example.com/begach'; */
 var GAME_API='';
 var PHASES=[
 {t:0,name:'РАССВЕТ',color:'#FFB3C8',hint:'разминка',speed:6,spawn:1520,comboPat:0,tr:255,tg:140,tb:175,ta:.14,night:.12},
@@ -438,7 +436,7 @@ function skinById(id){for(var i=0;i<SKINS.length;i++)if(SKINS[i].id===id)return 
 var toastTimer=null;
 function showToast(t,k){var e=$('toast');if(!e)return;e.textContent=t;e.className='toast show'+(k?' '+k:'');
 if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){e.className='toast'+(k?' '+k:'');},2600);}
-/* ================= ХРАНИЛИЩЕ (безопасное) ================= */
+/* ================= БЕЗОПАСНЫЙ ДОСТУП К localStorage ================= */
 var LS_OK=(function(){try{var k='__bg_t';window.localStorage.setItem(k,'1');window.localStorage.removeItem(k);return true;}catch(e){return false;}})();
 function lsGet(k){if(!LS_OK)return null;try{return window.localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){if(!LS_OK)return;try{window.localStorage.setItem(k,v);}catch(e){}}
@@ -480,9 +478,11 @@ sanitize();
 function writeLocal(){save.stats.skins=save.owned.length;lsSet(SAVE_KEY,JSON.stringify(save));}
 var cloudTimer=null,cloudPending=false,cloudBusy=false,cloudFails=0;
 function markCloud(){cloudPending=true;if(cloudTimer)return;cloudTimer=setTimeout(function(){cloudTimer=null;flushCloud();},CLOUD_DEBOUNCE);}
+/* ФИКС: если облако занято — не теряем флаг cloudPending, а повторяем позже */
 function flushCloud(){
 if(cloudTimer){clearTimeout(cloudTimer);cloudTimer=null;}
-if(!cloudPending||!vkAvailable()||cloudBusy)return;
+if(!cloudPending||!vkAvailable())return;
+if(cloudBusy){cloudTimer=setTimeout(function(){cloudTimer=null;flushCloud();},1500);return;}
 cloudBusy=true;cloudPending=false;
 var payload=JSON.stringify(save);
 if(payload.length>2200){var s=JSON.parse(payload);s.orders=s.orders.slice(-6);payload=JSON.stringify(s);}
@@ -493,7 +493,10 @@ else{cloudPending=true;cloudFails++;cloudTimer=setTimeout(function(){cloudTimer=
 });
 }
 function persist(){writeLocal();markCloud();}
-function persistNow(){writeLocal();flushCloud();}
+/* ГЛАВНЫЙ ФИКС СОХРАНЕНИЯ РЕЙТИНГА:
+   раньше persistNow() не взводил cloudPending, и flushCloud() выходил сразу —
+   рекорд не долетал до VK Storage. Теперь флаг ставится принудительно. */
+function persistNow(){writeLocal();cloudPending=true;flushCloud();}
 function loadBoard(){try{var a=JSON.parse(lsGet(LS_BOARD)||'null');return Array.isArray(a)?a:[];}catch(e){return[];}}
 function upsertBoard(en){
 var b=loadBoard(),f=-1,i;
@@ -514,9 +517,7 @@ if(window.parent&&window.parent!==window)return true;
 }catch(e){}
 return false;
 }
-function vkAvailable(){
-try{return !!(window.vkBridge&&typeof window.vkBridge.send==='function');}catch(e){return false;}
-}
+function vkAvailable(){try{return !!(window.vkBridge&&typeof window.vkBridge.send==='function');}catch(e){return false;}}
 function vkBridgeVersion(){try{return (window.vkBridge&&window.vkBridge.version)?window.vkBridge.version:'?';}catch(e){return '?';}}
 function vkSend(m,p){
 if(!vkAvailable())return Promise.resolve(null);
@@ -543,7 +544,6 @@ if(Array.isArray(g.ach))for(var a=0;a<g.ach.length;a++)if(save.ach.indexOf(g.ach
 if(g.stats)for(var k in save.stats)if(typeof g.stats[k]==='number'&&g.stats[k]>save.stats[k])save.stats[k]=g.stats[k];
 sanitize();
 }
-/* Дозагрузка моста, если ни локальный файл, ни первый CDN не сработали */
 function loadBridgeFrom(srcList,idx){
 if(idx>=srcList.length)return;
 if(vkAvailable()){vkInit();return;}
@@ -555,19 +555,12 @@ document.head.appendChild(s);
 }
 function bridgeWatchdog(){
 if(VKC.inited||vkAvailable())return;
-VKC.bridgeTries++;
-if(VKC.bridgeTries>24)return;
-setTimeout(function(){
-if(vkAvailable()){vkInit();}
-else bridgeWatchdog();
-},500);
+VKC.bridgeTries++;if(VKC.bridgeTries>24)return;
+setTimeout(function(){if(vkAvailable())vkInit();else bridgeWatchdog();},500);
 }
 function vkInit(){
 if(VKC.inited)return;
-if(!vkAvailable()){
-/* Мост ещё не загрузился — игру не блокируем */
-VKC.merged=true;refreshStart();bridgeWatchdog();return;
-}
+if(!vkAvailable()){VKC.merged=true;refreshStart();bridgeWatchdog();return;}
 VKC.inited=true;VKC.merged=true;
 vkSend('VKWebAppInit');
 vkSubscribe(function(e){
@@ -583,7 +576,7 @@ if(res&&res.keys)for(var i=0;i<res.keys.length;i++){
 var kv=res.keys[i];
 if(kv&&kv.key===SAVE_KEY&&kv.value){try{var cl=JSON.parse(kv.value);if(cl&&typeof cl==='object')mergeCloud(cl);}catch(e){}}
 }
-writeLocal();markCloud();finish();vkTrack('session_start',{platform:VKC.platform});
+writeLocal();cloudPending=true;flushCloud();finish();vkTrack('session_start',{platform:VKC.platform});
 if(save.high>0)globalSubmit(save.high);
 });
 }
@@ -1343,9 +1336,7 @@ CANVAS.style.width=r.width+'px';CANVAS.style.height=r.height+'px';
 CTX.setTransform(scaleFactorX,0,0,scaleFactorY,0,0);
 }catch(e){}
 }
-function fsSupported(){
-try{return !!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen);}catch(e){return false;}
-}
+function fsSupported(){try{return !!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen);}catch(e){return false;}}
 var fsWarned=false;
 function toggleFullscreen(){
 if(!fsSupported()){if(!fsWarned){fsWarned=true;showToast('Полноэкранный режим недоступен','info');}return;}
@@ -1775,6 +1766,8 @@ bumpQuest('phase',state.diff.phase+1,true);bumpQuest('combo',state.maxCombo,true
 var d=new Date();
 upsertBoard({id:state.run.id,s:state.score,c:state.coins,f:state.diff.phase+1,
 d:(d.getDate()<10?'0':'')+d.getDate()+'.'+((d.getMonth()+1)<10?'0':'')+(d.getMonth()+1)});
+/* РЕКОРД СОХРАНЯЕТСЯ: локально + принудительная запись в VK Storage */
+if(walletDirty)saveWallet();
 persistNow();refreshStart();
 globalSubmit(save.high);
 if(rec){SFX.record();HAPTIC.notify('success');}else{SFX.gameOver();HAPTIC.notify('error');}
@@ -2901,17 +2894,18 @@ bind('tabGlobal',function(){setBoardTab('global');});
 bind('tabMine',function(){setBoardTab('mine');});
 bind('diagBtn',function(){showDiag();});
 function showDiag(){
-var lines=[
+showFatal('Диагностика',[
 'VK Bridge: '+(vkAvailable()?'подключён (v'+vkBridgeVersion()+')':'НЕ подключён'),
 'Среда VK: '+(inVkEnv()?'да':'нет (обычный браузер)'),
 'localStorage: '+(LS_OK?'доступен':'заблокирован'),
 'Профиль синхронизирован: '+(VKC.merged?'да':'нет'),
 'ID пользователя: '+(VKC.userId||'—'),
 'Платформа: '+(VKC.platform||'—'),
+'Рекорд: '+fmt(save.high)+' · Монеты: '+fmt(save.wallet),
+'Бэкенд топа (GAME_API): '+(GAME_API||'не задан'),
 'Canvas: '+CANVAS.width+'×'+CANVAS.height,
 'Ошибок за сессию: '+bootErrors.length
-];
-showFatal('Диагностика',lines.join('\n'));
+].join('\n'));
 }
 function openShop(){
 if(walletDirty)saveWallet();
