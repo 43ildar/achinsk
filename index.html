@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>БЕГАЧ — Подслушано в Ачинске</title>
-<script src="https://unpkg.com/@vkontakte/vk-bridge@2/dist/browser.min.js"></script>
+<!-- Библиотека VK Bridge подключена локально (файл index.umd.js рядом с index.html) -->
+<script src="index.umd.js"></script>
 <style>
 :root{
   --night:#0b1020;--deep:#141c30;--surf:rgba(255,255,255,.07);--surf2:rgba(255,255,255,.11);
@@ -314,7 +315,7 @@ var PUP_FIRST=22000,PUP_MIN=15000,PUP_MAX=26000,PUP_MAX_ON_FIELD=2,SLOW_FACTOR=.
 var HEART_MIN_PHASE=4,HEART_COOLDOWN=50000,COMBO_TIMEOUT=10000,NEAR_MISS_MARGIN=32,NEAR_MISS_POTHOLE=46,NEAR_MISS_BONUS=50;
 var COIN_SCORE=25,DIAMOND_SCORE=250,WALLET_FLUSH_MS=1200,CROW_START_TIME=100000,CROW_WARN_MS=1400;
 var CROW_BASE_INTERVAL=24000,CROW_MIN_INTERVAL=10500,CROW_MAX_HOLD=8000;
-var CLOUD_DEBOUNCE=20000,CLOUD_RETRY=45000,START_WAIT=3500;
+var CLOUD_DEBOUNCE=4000,CLOUD_RETRY=45000,START_WAIT=3500;
 var GAME_API='';
 
 var PHASES=[
