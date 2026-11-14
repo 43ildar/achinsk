@@ -7,15 +7,17 @@
 <script src="https://unpkg.com/@vkontakte/vk-bridge@2/dist/browser.min.js"></script>
 <style>
 :root{
-  --night:#0d1220;--deep:#141c30;--surf:rgba(255,255,255,.07);--line:rgba(255,255,255,.17);--line2:rgba(255,255,255,.34);
-  --gold:#FFD700;--gold-d:#8a6508;--vk:#4e8cff;--vk-d:#2c5cb0;--cyan:#7FF3FF;--taiga:#3FD68C;--taiga-d:#12492f;
-  --rose:#FFB3C8;--amber:#FFB36B;--crow:#B98CFF;--danger:#FF5470;
+  --night:#0b1020;--deep:#141c30;--surf:rgba(255,255,255,.07);--surf2:rgba(255,255,255,.11);
+  --line:rgba(255,255,255,.17);--line2:rgba(255,255,255,.34);
+  --gold:#FFD700;--gold-d:#8a6508;--vk:#4e8cff;--vk-d:#2c5cb0;--cyan:#7FF3FF;
+  --taiga:#3FD68C;--taiga-d:#12492f;--rose:#FFB3C8;--amber:#FFB36B;--crow:#B98CFF;--danger:#FF5470;
   --common:#9AB0C8;--rare:#4E8CFF;--epic:#B98CFF;--legend:#FFD24A;--mythic:#FF5EA8;
   --text:#EEF3FA;--muted:#B9C6D8;--dim:#8C9CB4;
 }
 *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transparent 62%),
+body{background:
+  radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.20),transparent 62%),
   radial-gradient(620px 400px at 88% 6%,rgba(255,179,200,.14),transparent 64%),
   radial-gradient(700px 460px at 50% 108%,rgba(63,214,140,.13),transparent 62%),
   linear-gradient(165deg,#0b1020,#141c30 55%,#0a0f1c);
@@ -24,13 +26,13 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
 *{scrollbar-width:thin;scrollbar-color:var(--vk) rgba(255,255,255,.08)}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:8px}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--vk),var(--crow));border-radius:8px;border:2px solid rgba(13,18,32,.9)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--vk),var(--crow));border-radius:8px;border:2px solid rgba(11,16,32,.9)}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--cyan),var(--taiga))}
 #gameWrapper{position:relative;container-type:size;width:min(100%,calc(100vh * 16 / 9),960px);aspect-ratio:16/9;
   box-shadow:0 22px 64px rgba(0,0,0,.62),0 0 0 1px rgba(255,255,255,.07);border-radius:12px;overflow:hidden;background:var(--night)}
 #gameCanvas{display:block;width:100%;height:100%;cursor:pointer;touch-action:none}
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;
-  background:linear-gradient(180deg,rgba(9,12,26,.9),rgba(10,14,28,.87));color:var(--text);text-align:center;
+  background:linear-gradient(180deg,rgba(9,12,26,.90),rgba(10,14,28,.88));color:var(--text);text-align:center;
   padding:14px 18px;gap:8px;backdrop-filter:blur(5px);z-index:5;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain}
 .overlay>*:first-child{margin-top:auto}.overlay>*:last-child{margin-bottom:auto}
 .overlay.hidden{display:none!important}
@@ -46,7 +48,7 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
 .btn.share{background:#4C75A3;box-shadow:0 4px 0 #2e4a6b}
 .btn.shop{background:#8E44AD;box-shadow:0 4px 0 #5B2C6F}
 .btn.help{background:#2E86C1;box-shadow:0 4px 0 #1B4F72}
-.btn.board{background:#B8860B;box-shadow:0 4px 0 var(--gold-d)}
+.btn.board{background:linear-gradient(135deg,#B8860B,#E0A81E);box-shadow:0 4px 0 var(--gold-d)}
 .btn.quest{background:#1E7A4E;box-shadow:0 4px 0 var(--taiga-d)}
 .btn.ghost{background:transparent;box-shadow:none;border:2px solid var(--line2);color:#dbe3ee}
 .btn.sm{padding:7px 13px;font-size:clamp(11px,2.1vw,14px);border-radius:9px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
@@ -64,12 +66,30 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
 .bar{height:9px;border-radius:99px;background:rgba(0,0,0,.45);overflow:hidden;border:1px solid var(--line)}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--taiga),var(--cyan),var(--gold));border-radius:99px;transition:width .4s}
 .lb-title{font-size:12px;color:var(--gold);font-weight:700;margin-bottom:4px}
-.lb-row{display:flex;gap:8px;align-items:center;font-size:13px;color:#e8eef5;padding:3px 5px;border-radius:6px}
-.lb-pos{width:22px;color:#9AD1FF;font-weight:700}
-.lb-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lb-score{font-weight:700;color:var(--gold)}
+.lb-row{display:flex;gap:10px;align-items:center;font-size:13.5px;color:#e8eef5;padding:7px 9px;border-radius:8px}
+.lb-row+.lb-row{margin-top:2px}
+.lb-row.me{background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.35)}
+.lb-row.top1{background:linear-gradient(90deg,rgba(255,215,0,.2),rgba(255,215,0,.03))}
+.lb-row.top2{background:linear-gradient(90deg,rgba(200,214,232,.16),transparent)}
+.lb-row.top3{background:linear-gradient(90deg,rgba(224,168,30,.16),transparent)}
+.lb-pos{width:32px;color:#9AD1FF;font-weight:800;flex:0 0 auto;font-size:14px}
+.lb-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;font-weight:600}
+.lb-score{font-weight:800;color:var(--gold);flex:0 0 auto}
+.lb-sub{font-size:11px;color:var(--dim);font-weight:400}
+.bd-me{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,rgba(255,215,0,.16),rgba(255,159,67,.07));
+  border:1px solid rgba(255,215,0,.32);border-radius:11px;padding:10px 14px;margin-bottom:10px}
+.bd-me .lbl{flex:1;font-size:13px;color:#e6ecf5;font-weight:700;text-align:left}
+.bd-me .val{font-size:21px;font-weight:800;color:var(--gold);line-height:1}
+.bd-empty{padding:30px 12px;text-align:center;color:var(--dim);font-size:13.5px;line-height:1.6}
+.bd-empty .ico{display:block;font-size:34px;margin-bottom:8px;opacity:.85}
+.bd-stats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.bd-stats span{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:11.5px;color:var(--muted);font-weight:600}
+.bd-stats b{color:#fff;font-weight:800}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.22);border-top-color:var(--cyan);
+  border-radius:50%;animation:sp .8s linear infinite;vertical-align:-3px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
 .bd-head{color:var(--gold);font-weight:700;font-size:14px;margin:10px 0 4px}.bd-head:first-child{margin-top:2px}
-.bd-note{font-size:12px;color:var(--dim);margin:4px 0 8px;line-height:1.45}
+.bd-note{font-size:12px;color:var(--dim);margin:4px 0 8px;line-height:1.5;text-align:left}
 .help-box{width:100%;max-width:680px;max-height:54vh;overflow-y:auto;text-align:left;background:var(--surf);
   border:1px solid var(--line);border-radius:12px;padding:12px 17px;flex:0 1 auto;touch-action:pan-y}
 .help-box h3{color:var(--gold);font-size:clamp(13px,2.5vw,17px);margin:10px 0 4px}
@@ -152,9 +172,11 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
   .overlay{padding:7px 12px;gap:5px}.overlay h1{font-size:clamp(15px,4.4vh,24px)}
   .overlay h2{font-size:clamp(11px,3vh,17px)}.overlay p{font-size:clamp(10px,2.4vh,13px)}
   #startBtn{padding:8px 30px;font-size:clamp(13px,3.8vh,21px)}.btn{padding:6px 14px;font-size:clamp(10px,2.8vh,14px)}
-  .help-box{max-height:44vh;padding:8px 12px}.skin-list{max-height:40vh}
+  .help-box{max-height:42vh;padding:8px 12px}.skin-list{max-height:40vh}
   .hero-preview{flex:0 0 clamp(118px,30vh,148px);padding:6px}.hp-desc{display:none}
   .score-big{font-size:clamp(20px,7.5vh,38px)}.grid{max-height:40vh}
+  .lb-row{padding:5px 8px;font-size:12.5px}.bd-me{padding:7px 12px}.bd-me .val{font-size:18px}
+  .bd-empty{padding:18px 10px}.bd-empty .ico{font-size:26px;margin-bottom:5px}
 }
 </style>
 </head>
@@ -175,7 +197,7 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
 <button class="btn" id="startBtn">Играть</button>
 <div class="btn-row">
 <button class="btn shop" id="shopBtn">🛍 Гардероб</button><button class="btn quest" id="questsBtn">🎯 Задания</button>
-<button class="btn board" id="boardBtn">🏆 Рекорды</button><button class="btn help" id="helpBtn">❓ Как играть</button>
+<button class="btn board" id="boardBtn">🌍 Общий топ</button><button class="btn help" id="helpBtn">❓ Как играть</button>
 </div>
 <div class="foot-note"><span>0+</span><button class="link" id="privacyBtn">Политика и данные</button><span>@achpod</span></div>
 </div>
@@ -190,6 +212,8 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
 <li><b>повторное нажатие в воздухе</b> — двойной прыжок;</li>
 <li><b>P / Esc</b> или ⏸ — пауза; 🔊 — звук; ⛶ — во весь экран;</li>
 <li>📱 На телефоне игра попросит повернуть экран горизонтально.</li></ul>
+<h3>🌍 Общий топ</h3>
+<p>Рейтинг единый для всех игроков VK Mini Apps.</p>
 <h3>👗 Гардероб</h3>
 <p>Скины бывают <b>пяти редкостей</b> — чем выше редкость, тем красивее образ и его эффекты. Среди мифических — <b>Супер Ачинец</b> в маске, скрывающей лицо, и <b>Кибер Ачинец</b> — робот со стальными пластинами и светящимся ядром. Одежда и эффекты — только косметика: прыжок, скорость и хитбокс у всех одинаковые.</p>
 <h3>📈 Фазы сложности</h3>
@@ -235,8 +259,15 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
 <button class="btn" id="shopBackBtn">Назад</button>
 </div>
 
-<div class="overlay hidden" id="boardScreen"><h1>🏆 Рекорды</h1><div class="help-box" id="boardBox"></div>
-<div class="btn-row"><button class="btn board sm" id="boardVkBtn">Таблица сообщества VK</button><button class="btn" id="boardBackBtn">Назад</button></div>
+<div class="overlay hidden" id="boardScreen">
+<h1 id="boardTitle">🌍 Общий топ</h1>
+<div class="tabs"><button class="tab on" id="tabGlobal">Все игроки</button><button class="tab" id="tabMine">Мои забеги</button></div>
+<div class="help-box" id="boardBox"></div>
+<div class="btn-row">
+<button class="btn board sm" id="boardVkBtn">🌍 Открыть топ</button>
+<button class="btn ghost sm" id="boardRefreshBtn">⟳ Обновить</button>
+<button class="btn" id="boardBackBtn">Назад</button>
+</div>
 </div>
 
 <div class="overlay hidden" id="questsScreen"><h1>🎯 Задания и достижения</h1><div class="card tight" id="dailyCard"></div><div class="help-box" id="questsBox"></div><button class="btn" id="questsBackBtn">Назад</button></div>
@@ -246,13 +277,14 @@ body{background:radial-gradient(720px 440px at 12% 0%,rgba(78,140,255,.2),transp
 <p id="runStats" style="color:var(--amber);font-weight:700"></p><p id="runGoal" style="color:#9AD1FF"></p>
 <div class="btn-row" id="rewardRow"><button class="btn gold sm" id="reviveBtn">🎬 Второй шанс</button><button class="btn gold sm" id="dblBtn">🎬 Удвоить монеты</button></div>
 <button class="btn" id="restartBtn">Играть снова</button>
-<div class="btn-row"><button class="btn shop sm" id="shopBtn2">🛍 Гардероб</button><button class="btn board sm" id="boardBtn2">🏆 Рекорды</button><button class="btn share sm" id="shareBtn">Поделиться</button><button class="btn ghost sm" id="menuBtn">В меню</button></div>
+<div class="btn-row"><button class="btn shop sm" id="shopBtn2">🛍 Гардероб</button><button class="btn board sm" id="boardBtn2">🌍 Общий топ</button><button class="btn share sm" id="shareBtn">Поделиться</button><button class="btn ghost sm" id="menuBtn">В меню</button></div>
 </div>
 
 <div class="overlay hidden" id="privacyScreen"><h1>🔒 Данные и политика</h1>
 <div class="help-box">
 <h3>Что хранится</h3><p>Рекорд, монеты, скины, ежедневная награда, задания, одноразовые достижения и настройка звука. Данные привязаны к идентификатору ВКонтакте, сохраняются в VK Storage и локально как резервная копия.</p>
-<h3>Что не собирается</h3><p>Игра не запрашивает доступ к друзьям, сообщениям, фотографиям, геолокации и контактам. Публикация результата — только по кнопке «Поделиться».</p>
+<h3>Общий рейтинг</h3><p>В общий топ попадают все игроки приложения. В таблице видны имя игрока и его рекорд — других данных мы не публикуем.</p>
+<h3>Что не собирается</h3><p>Игра не запрашивает доступ к друзьям, сообщениям, фотографиям, геолокации и контактам. Публикация результата в ленту — только по кнопке «Поделиться».</p>
 <h3>Реклама и покупки</h3><p>Реклама показывается сервисом ВКонтакте: rewarded — по добровольному нажатию, межстраничная — между забегами, баннер — в меню. Покупки проводятся через платежи ВКонтакте.</p>
 <h3>Возраст и поддержка</h3><p>0+. Вопросы — сообщество «Подслушано в Ачинске» (@achpod).</p>
 </div><button class="btn" id="privacyBackBtn">Назад</button>
@@ -283,6 +315,7 @@ var HEART_MIN_PHASE=4,HEART_COOLDOWN=50000,COMBO_TIMEOUT=10000,NEAR_MISS_MARGIN=
 var COIN_SCORE=25,DIAMOND_SCORE=250,WALLET_FLUSH_MS=1200,CROW_START_TIME=100000,CROW_WARN_MS=1400;
 var CROW_BASE_INTERVAL=24000,CROW_MIN_INTERVAL=10500,CROW_MAX_HOLD=8000;
 var CLOUD_DEBOUNCE=20000,CLOUD_RETRY=45000,START_WAIT=3500;
+var GAME_API='';
 
 var PHASES=[
 {t:0,name:'РАССВЕТ',color:'#FFB3C8',hint:'разминка',speed:6,spawn:1520,comboPat:0,tr:255,tg:140,tb:175,ta:.14,night:.12},
@@ -301,7 +334,6 @@ var MECH_NAMES={cape:'Плащ',scarf:'Шарф',breath:'Пар изо рта',n
 emblem:'Эмблема «А»',trail:'След скорости',frost:'Ледяной вихрь',pack:'Рюкзак',lamp:'Фонарь',
 crown:'Корона',mask:'Маска',robot:'Робот',core:'Светящееся ядро'};
 
-/* ======= СКИНЫ ======= */
 var SKINS=[
 {id:'classic',name:'Классика',rarity:'common',price:0,reqRuns:0,hatStyle:'ushanka',mech:{},
  desc:'Тот самый бегач: ушанка, тулуп, джинсы и кеды.',
@@ -378,8 +410,8 @@ function showToast(t,k){var e=$('toast');if(!e)return;e.textContent=t;e.classNam
 window.addEventListener('error',function(e){try{showToast('Ошибка: '+(e.message||'неизвестная'),'err');}catch(x){}});
 
 /* ================= СОХРАНЕНИЕ ================= */
-var SAVE_KEY='begach_save_v10',LS_MUTE='begach_muted',LS_BOARD='begach_board_v10';
-var save={v:10,wallet:0,high:0,owned:['classic'],skin:'classic',noAds:false,
+var SAVE_KEY='begach_save_v13',LS_MUTE='begach_muted',LS_BOARD='begach_board_v13';
+var save={v:13,wallet:0,high:0,owned:['classic'],skin:'classic',noAds:false,
  daily:{last:'',streak:0},quests:{date:'',list:[]},ach:[],orders:[],
  stats:{runs:0,coins:0,best:0,combo:0,phase:0,near:0,skins:1}};
 function sanitize(){
@@ -399,7 +431,7 @@ function sanitize(){
 }
 function readLocal(){
  try{
-  var raw=localStorage.getItem(SAVE_KEY)||localStorage.getItem('begach_save_v9');
+  var raw=localStorage.getItem(SAVE_KEY)||localStorage.getItem('begach_save_v12')||localStorage.getItem('begach_save_v11');
   if(!raw){
    var w=parseInt(localStorage.getItem('achinsk_runner_v2_wallet')||'0',10);
    var h=parseInt(localStorage.getItem('achinsk_runner_v2_highscore')||'0',10);
@@ -475,6 +507,7 @@ function vkInit(){
    if(kv&&kv.key===SAVE_KEY&&kv.value){try{var cl=JSON.parse(kv.value);if(cl&&typeof cl==='object')mergeCloud(cl);}catch(e){}}
   }
   writeLocal();markCloud();finish();vkTrack('session_start',{platform:VKC.platform});
+  if(save.high>0)globalSubmit(save.high);
  });
 }
 var HAPTIC={
@@ -483,6 +516,51 @@ var HAPTIC={
  notify:function(t){if(vkAvailable()){vkSend('VKWebAppTapticNotificationOccurred',{type:t});return;}
   try{if(navigator.vibrate)navigator.vibrate(t==='success'?[20,40,20]:[60,40,60]);}catch(e){}}
 };
+
+/* ================= ОБЩИЙ РЕЙТИНГ ================= */
+var Global={loading:false,items:[],me:null,err:'',at:0,sent:0};
+function globalMode(){return GAME_API?'api':(vkAvailable()?'vk':'offline');}
+function globalLoad(force){
+ if(ui.screen!=='board')return;
+ if(!GAME_API){renderBoard();return;}
+ if(Global.loading)return;
+ if(!force&&Date.now()-Global.at<30000){renderBoard();return;}
+ Global.loading=true;Global.err='';renderBoard();
+ var url=GAME_API.replace(/\/$/,'')+'/top?limit=20'+(VKC.userId?('&user_id='+VKC.userId):'');
+ var done=false;
+ var to=setTimeout(function(){if(done)return;done=true;Global.loading=false;Global.err='Сервер не отвечает';renderBoard();},8000);
+ try{
+  fetch(url,{method:'GET',headers:{'Accept':'application/json'}}).then(function(r){return r.json();}).then(function(d){
+   if(done)return;done=true;clearTimeout(to);
+   Global.loading=false;Global.at=Date.now();
+   Global.items=(d&&Array.isArray(d.items))?d.items:[];
+   Global.me=(d&&d.me)?d.me:null;Global.err='';
+   renderBoard();
+  }).catch(function(){
+   if(done)return;done=true;clearTimeout(to);
+   Global.loading=false;Global.err='Не удалось загрузить';renderBoard();
+  });
+ }catch(e){done=true;clearTimeout(to);Global.loading=false;Global.err='Сеть недоступна';renderBoard();}
+}
+function globalSubmit(score){
+ if(!(score>0))return;
+ score=Math.min(10000000,Math.floor(score));
+ if(score<=Global.sent)return;
+ Global.sent=score;
+ if(GAME_API){
+  try{
+   fetch(GAME_API.replace(/\/$/,'')+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({user_id:VKC.userId||0,name:VKC.name||'',score:score,ts:Date.now()})}).catch(function(){});
+  }catch(e){}
+ }
+ vkTrack('leaderboard_submit',{score:score});
+}
+function openGlobalBoard(){
+ if(vkAvailable()){
+  vkSend('VKWebAppShowLeaderBoardBox',{user_result:Math.min(10000000,Math.floor(save.high||state.score||0)),global:1})
+   .then(function(r){if(!r)showToast('Топ сейчас недоступен','info');});
+ }else showToast('Доступно в VK Mini Apps','info');
+}
 
 /* ================= ЗВУК ================= */
 var SFX=(function(){
@@ -615,7 +693,7 @@ var state={mode:'start',score:0,bonusScore:0,coins:0,lives:3,speed:BASE_SPEED,di
  spawnTimer:0,deathT:0,deathRot:0,deathDX:0,deathLanded:false,
  run:{id:'',reviveUsed:false,doubleUsed:false,coins:0},pendingBoost:false,skin:SKINS[0],
  cosmo:{trail:0,gold:0,breath:0,frost:0,pack:0,spark:0}};
-var ui={screen:'start',back:'start',shopTab:'skins',previewSkin:'classic'};
+var ui={screen:'start',back:'start',shopTab:'skins',previewSkin:'classic',boardTab:'global'};
 function applySkin(){state.skin=skinById(save.skin)||SKINS[0];}
 
 /* ================= ЭКРАНЫ ================= */
@@ -714,7 +792,7 @@ function renderQuests(){
    ' · награда '+it.reward+' 💰</div></div><div>'+(it.claimed?'<span class="badge">Готово</span>':
    (it.prog>=it.target?'<button class="btn quest sm" data-claim="'+i+'">Забрать</button>':'<span class="badge off">В процессе</span>'))+'</div></div>';
  }
- q+='<div class="bd-head">🏅 Достижения · выдаются один раз</div><div class="bd-note">Получено наград: <b>'+fmt(achEarned())+'</b> из <b>'+fmt(achTotal())+'</b> монет.</div>';
+ q+='<div class="bd-head">🏅 Достижения · выдаются один раз</div><div class="bd-note">Получено: <b>'+fmt(achEarned())+'</b> из <b>'+fmt(achTotal())+'</b> монет.</div>';
  for(i=0;i<ACHIEVEMENTS.length;i++){
   var a=ACHIEVEMENTS[i],g=save.ach.indexOf(a.id)>=0,v=Math.min(save.stats[a.key]||0,a.goal),p=Math.round(v/a.goal*100);
   q+='<div class="quest-row"><div class="q-ico">'+a.ico+'</div><div class="q-body"><div class="q-title">'+esc(a.name)+'</div>'+
@@ -833,7 +911,6 @@ function drawRunnerBody(x,y,sk,runFrame,onGround,t){
   C.fillStyle='#FFE9A0';C.beginPath();C.arc(x+34,y+3,3,0,TAU);C.fill();
  }
 }
-/* --- маска Супер Ачинца --- */
 function drawHeroMask(x,y,sk,t){
  var base=sk.hat,dark=sk.jacketDark,gold=sk.hatTrim;
  var glow=.55+.45*Math.sin(t*.005);
@@ -863,7 +940,6 @@ function drawHeroMask(x,y,sk,t){
  C.strokeStyle=gold;C.lineWidth=1.6;C.lineCap='round';
  C.beginPath();C.moveTo(x+25,y-4);C.lineTo(x+25,y+4);C.stroke();C.lineCap='butt';
 }
-/* --- Кибер Ачинец: робот (одиночная фигура, без задвоения) --- */
 function drawRobotBody(x,y,sk,runFrame,onGround,t){
  var metal=sk.jacket,dark=sk.jacketDark,plate=sk.hat,glow=sk.accent,trim=sk.hatTrim;
  var legOffset=onGround?Math.sin(runFrame*.8)*12:0;
@@ -968,7 +1044,6 @@ function drawPlayer(p){
  }
  drawRunnerBody(x,y,sk,p.runFrame,p.onGround,state.ambientTime);
 }
-/* ---------- превью ---------- */
 var previewFrame=0;
 function renderPreview(dt){
  var cv=$('skinPreview');if(!cv)return;
@@ -1099,19 +1174,75 @@ $('goodsGrid').addEventListener('click',function(e){
 function setShopTab(t){ui.shopTab=t;
  $('tabSkins').classList.toggle('on',t==='skins');$('tabGoods').classList.toggle('on',t==='goods');
  $('wardrobeWrap').style.display=t==='skins'?'':'none';$('goodsGrid').style.display=t==='goods'?'':'none';}
-function renderBoard(){
- var html='<div class="bd-head">🌐 Сообщество ВКонтакте</div><div class="bd-note">'+
-  (vkAvailable()?'Штатная таблица результатов открывается кнопкой ниже.':'Таблица сообщества доступна внутри ВКонтакте.')+
-  '</div><div class="bd-head">📱 Топ-10 на этом устройстве</div>';
- var b=loadBoard(),i;
- if(!b.length)html+='<div class="bd-note">Забегов пока нет — закончи первый, и результаты появятся здесь.</div>';
- else for(i=0;i<b.length;i++)html+='<div class="lb-row"><span class="lb-pos">'+(i+1)+'</span><span class="lb-name">'+
-  esc(b[i].d+' · фаза '+b[i].f+' · 💰'+b[i].c)+'</span><span class="lb-score">'+fmt(b[i].s)+'</span></div>';
- html+='<div class="bd-head">📊 Всего</div><div class="bd-note">Забегов: <b>'+fmt(save.stats.runs)+'</b> · монет: <b>'+fmt(save.stats.coins)+
-  '</b> · впритирку: <b>'+fmt(save.stats.near)+'</b> · комбо: <b>'+fmt(save.stats.combo)+'</b> · скинов: <b>'+save.owned.length+'/'+SKINS.length+'</b></div>';
- $('boardBox').innerHTML=html;$('boardVkBtn').style.display=vkAvailable()?'':'none';
+
+/* ================= ТОП ================= */
+function setBoardTab(t){
+ ui.boardTab=t;
+ $('tabGlobal').classList.toggle('on',t==='global');
+ $('tabMine').classList.toggle('on',t==='mine');
+ $('boardTitle').textContent=t==='global'?'🌍 Общий топ':'👤 Мои забеги';
+ renderBoard();
+ if(t==='global')globalLoad(false);
 }
-function submitScore(s){if(s>0&&vkAvailable())vkSend('VKWebAppShowLeaderBoardBox',{user_result:Math.min(10000000,Math.floor(s)),global:1});}
+function renderBoard(){
+ var box=$('boardBox');if(!box)return;
+ var html='',i;
+ if(ui.boardTab==='mine'){
+  var b=loadBoard();
+  if(!b.length){
+   html='<div class="bd-empty"><span class="ico">🏁</span>Пока нет забегов</div>';
+  }else{
+   for(i=0;i<b.length;i++){
+    html+='<div class="lb-row'+(i===0?' top1':'')+'"><span class="lb-pos">'+(i+1)+'</span>'+
+     '<span class="lb-name">'+esc(b[i].d)+'<span class="lb-sub"> · фаза '+b[i].f+' · 💰 '+b[i].c+'</span></span>'+
+     '<span class="lb-score">'+fmt(b[i].s)+'</span></div>';
+   }
+  }
+  html+='<div class="bd-stats">'+
+   '<span>Забегов <b>'+fmt(save.stats.runs)+'</b></span>'+
+   '<span>Монет <b>'+fmt(save.stats.coins)+'</b></span>'+
+   '<span>Впритирку <b>'+fmt(save.stats.near)+'</b></span>'+
+   '<span>Комбо <b>'+fmt(save.stats.combo)+'</b></span>'+
+   '<span>Скинов <b>'+save.owned.length+'/'+SKINS.length+'</b></span></div>';
+  box.innerHTML=html;
+  $('boardVkBtn').style.display='none';
+  $('boardRefreshBtn').style.display='none';
+  return;
+ }
+ var rank=Global.me&&Global.me.rank?Global.me.rank:0;
+ html+='<div class="bd-me"><span class="lbl">'+(rank?('Твоё место · #'+rank):'Твой рекорд')+'</span><span class="val">'+fmt(save.high)+'</span></div>';
+ var mode=globalMode();
+ if(Global.loading){
+  html+='<div class="bd-empty"><span class="spin"></span>Загрузка…</div>';
+ }else if(Global.items.length){
+  for(i=0;i<Global.items.length&&i<20;i++){
+   var it=Global.items[i],r=it.rank||(i+1);
+   var me=!!(VKC.userId&&it.user_id===VKC.userId);
+   var cls=me?' me':(r===1?' top1':r===2?' top2':r===3?' top3':'');
+   var medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
+   html+='<div class="lb-row'+cls+'"><span class="lb-pos">'+medal+'</span>'+
+    '<span class="lb-name">'+esc(it.name||'Бегач')+(me?' <span class="lb-sub">(ты)</span>':'')+'</span>'+
+    '<span class="lb-score">'+fmt(it.score)+'</span></div>';
+  }
+ }else if(Global.err){
+  html+='<div class="bd-empty"><span class="ico">⚠️</span>'+esc(Global.err)+'</div>';
+ }else if(mode==='vk'){
+  html+='<div class="bd-empty"><span class="ico">🌍</span>Открой топ кнопкой ниже</div>';
+ }else if(mode==='api'){
+  html+='<div class="bd-empty"><span class="ico">🏁</span>Пока нет результатов</div>';
+ }else{
+  html+='<div class="bd-empty"><span class="ico">🌍</span>Доступно в VK</div>';
+ }
+ box.innerHTML=html;
+ $('boardVkBtn').style.display=vkAvailable()?'':'none';
+ $('boardRefreshBtn').style.display=(mode==='api')?'':'none';
+}
+function openBoard(){
+ ui.boardTab='global';
+ $('tabGlobal').classList.add('on');$('tabMine').classList.remove('on');
+ $('boardTitle').textContent='🌍 Общий топ';
+ openSub('board');renderBoard();globalLoad(false);
+}
 
 /* ================= РАЗМЕРЫ ================= */
 var scaleFactorX=1,scaleFactorY=1,dpr=1,viewScale=1;
@@ -1560,7 +1691,8 @@ function enterGameOver(){
  upsertBoard({id:state.run.id,s:state.score,c:state.coins,f:state.diff.phase+1,
   d:(d.getDate()<10?'0':'')+d.getDate()+'.'+((d.getMonth()+1)<10?'0':'')+(d.getMonth()+1)});
  persistNow();refreshStart();
- if(rec){SFX.record();HAPTIC.notify('success');submitScore(state.score);}else{SFX.gameOver();HAPTIC.notify('error');}
+ globalSubmit(save.high);
+ if(rec){SFX.record();HAPTIC.notify('success');}else{SFX.gameOver();HAPTIC.notify('error');}
  checkAchievements();vkTrack('run_end',{score:state.score,coins:state.coins});
  $('finalScore').textContent=fmt(state.score);
  $('highScoreText').textContent=(rec?'🏆 Новый рекорд! · ':'Рекорд: ')+fmt(save.high)+' · Монет за забег: '+fmt(state.coins);
@@ -1571,6 +1703,7 @@ function enterGameOver(){
   if(save.stats.runs<nxt.reqRuns)goal='🔒 «'+nxt.name+'» откроется после '+nxt.reqRuns+' забегов';
   else if(left>0)goal='💰 До скина «'+nxt.name+'» осталось '+fmt(left)+' монет';
   else goal='🛍 Хватает на «'+nxt.name+'» — загляни в гардероб!';}
+ if(!goal&&rec)goal='🌍 Рекорд отправлен в общий топ';
  if(!goal&&state.maxCombo<35)goal='🔥 До множителя ×5 не хватило '+(35-state.maxCombo)+' монет подряд';
  if(!goal&&state.diff.phase<PHASES.length-1)goal='🌙 До фазы «'+PHASES[state.diff.phase+1].name+'» не хватило '+Math.ceil((PHASES[state.diff.phase+1].t-state.gameTime)/1000)+' с';
  $('runGoal').textContent=goal;
@@ -1608,15 +1741,14 @@ function doBoost(){if(state.pendingBoost)return;
  Ads.rewarded('start_boost').then(function(ok){if(!ok)return;state.pendingBoost=true;refreshStart();SFX.reward();showToast('Щит и магнит активируются на старте');});}
 function restartFlow(){var go=function(){startGame();};if(Ads.canInterstitial())Ads.interstitial().then(go);else go();}
 function shareResult(){
- var t='🏃 Я набрал '+fmt(state.score)+' очков и добежал до фазы «'+state.diff.name+'» в игре БЕГАЧ от @achpod! Мой скин: '+state.skin.name+'. Попробуй побить мой рекорд!';
- var link='https://vk.com/achpod';
+ var t='🏃 Я набрал '+fmt(state.score)+' очков и добежал до фазы «'+state.diff.name+'» в игре БЕГАЧ! Мой скин: '+state.skin.name+'. Попробуй побить мой рекорд!';
  function fb(){var ok=false;
-  try{var ta=document.createElement('textarea');ta.value=t+' '+link;ta.setAttribute('readonly','');
+  try{var ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');
    ta.style.position='fixed';ta.style.top='-1000px';document.body.appendChild(ta);ta.select();
    ok=document.execCommand('copy');document.body.removeChild(ta);}catch(e){ok=false;}
   showToast(ok?'Скопировано — вставь в ВК 📋':'Не удалось скопировать',ok?'':'err');}
- if(vkAvailable()){vkSend('VKWebAppShare',{link:link,text:t}).then(function(r){if(r){SFX.ui();showToast('Спасибо, что делишься!');}else fb();});return;}
- if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t+' '+link).then(function(){showToast('Скопировано 📋');},fb);else fb();
+ if(vkAvailable()){vkSend('VKWebAppShare',{text:t}).then(function(r){if(r){SFX.ui();showToast('Спасибо, что делишься!');}else fb();});return;}
+ if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(function(){showToast('Скопировано 📋');},fb);else fb();
 }
 
 /* ================= ПРИМИТИВЫ ================= */
@@ -2680,8 +2812,12 @@ bind('startBtn',startGame);bind('restartBtn',restartFlow);bind('menuBtn',goMenu)
 bind('pauseRestartBtn',function(){setScreen(null);restartFlow();});
 bind('helpBtn',function(){openSub('help');});bind('helpBackBtn',closeSub);
 bind('privacyBtn',function(){openSub('privacy');});bind('privacyBackBtn',closeSub);
-bind('boardBtn',function(){renderBoard();openSub('board');});bind('boardBtn2',function(){renderBoard();openSub('board');});
-bind('boardBackBtn',closeSub);bind('boardVkBtn',function(){submitScore(save.high||state.score);});
+bind('boardBtn',openBoard);bind('boardBtn2',openBoard);
+bind('boardBackBtn',closeSub);
+bind('boardVkBtn',openGlobalBoard);
+bind('boardRefreshBtn',function(){Global.at=0;globalLoad(true);});
+bind('tabGlobal',function(){setBoardTab('global');});
+bind('tabMine',function(){setBoardTab('mine');});
 function openShop(){
  if(walletDirty)saveWallet();
  ui.previewSkin=save.skin;previewFrame=0;
