@@ -1859,6 +1859,26 @@ function getDiaGrad(){if(!diaGrad){diaGrad=CTX.createLinearGradient(0,-16,0,16);
 diaGrad.addColorStop(0,'#B8F6FF');diaGrad.addColorStop(.5,'#7FF3FF');diaGrad.addColorStop(1,'#2AC8E8');}return diaGrad;}
 /* ================= СПРАЙТЫ ГОРОДА ================= */
 var SPR={},spritesOk=false;
+/* === ЛОГОТИП НА БИЛБОРДЕ === */
+var LOGO_IMG=null;
+(function(){
+var candidates=['logo.png','logo.jpg','logo.jpeg','logo.webp','Logo.png'];
+var idx=0;
+function tryNext(){
+if(idx>=candidates.length)return;
+var img=new Image();
+img.onload=function(){
+LOGO_IMG=img;
+/* Перерисовываем билборд после загрузки логотипа */
+if(spritesOk&&typeof makeSprite==='function'&&typeof drawBillboardPaint==='function'){
+SPR.bill=makeSprite(226,208,0,drawBillboardPaint);
+}
+};
+img.onerror=function(){idx++;tryNext();};
+img.src=candidates[idx];
+}
+tryNext();
+})();
 function makeSprite(w,h,px,fn){
 var cv=document.createElement('canvas');
 cv.width=Math.max(2,Math.round(w*SPR_SCALE));cv.height=Math.max(2,Math.round(h*SPR_SCALE));
@@ -2109,40 +2129,15 @@ C.fillRect(bx+bw-40,gy-66,12,66);C.strokeRect(bx+bw-40,gy-66,12,66);
 C.fillStyle='#E8ECEF';C.fillRect(x-6,by-6,bw+12,bh+12);C.strokeRect(x-6,by-6,bw+12,bh+12);
 C.save();C.beginPath();C.rect(x,by,bw,bh);C.clip();
 C.fillStyle='#FBFDFE';C.fillRect(x,by,bw,bh);
-var CX=x+bw/2,CY=by+bh/2-8;
-C.save();C.translate(CX,CY);
-var bg=C.createLinearGradient(0,-50,0,50);
-bg.addColorStop(0,'#9FD4EE');bg.addColorStop(.7,'#F6D8C8');bg.addColorStop(1,'#F2C8B0');
-C.fillStyle=bg;C.beginPath();C.ellipse(0,0,76,50,0,0,TAU);C.fill();C.restore();
-C.fillStyle='rgba(110,145,180,.85)';C.fillRect(CX-62,CY+4,26,42);
-C.fillStyle='rgba(190,140,110,.9)';C.fillRect(CX-72,CY+22,34,30);
-C.fillStyle='rgba(150,170,190,.7)';C.fillRect(CX+36,CY+18,30,34);
-C.strokeStyle='#5A9E4B';C.lineWidth=5;C.beginPath();C.ellipse(CX,CY,76,50,0,0,TAU);C.stroke();
-C.strokeStyle='#5A2E1E';C.lineWidth=5;C.lineCap='round';C.beginPath();
-C.moveTo(CX-22,CY-24);C.lineTo(CX-34,CY-44);C.moveTo(CX-30,CY-38);C.lineTo(CX-40,CY-40);
-C.moveTo(CX+2,CY-24);C.lineTo(CX+16,CY-44);C.moveTo(CX+12,CY-38);C.lineTo(CX+22,CY-40);
-C.stroke();C.lineCap='butt';
-C.fillStyle='#E8A462';C.strokeStyle='#3A2A1A';C.lineWidth=2;
-C.beginPath();C.ellipse(CX-28,CY-18,9,5,-.5,0,TAU);C.fill();C.stroke();
-C.beginPath();C.ellipse(CX+8,CY-18,9,5,.5,0,TAU);C.fill();C.stroke();
-C.beginPath();C.ellipse(CX-10,CY-2,24,22,0,0,TAU);C.fill();C.stroke();
-C.fillStyle='#FFF';
-C.beginPath();C.arc(CX-18,CY-13,6,0,TAU);C.fill();C.stroke();
-C.beginPath();C.arc(CX-4,CY-13,6,0,TAU);C.fill();C.stroke();
-C.fillStyle='#222';
-C.beginPath();C.arc(CX-17,CY-12,2.4,0,TAU);C.fill();
-C.beginPath();C.arc(CX-3,CY-12,2.4,0,TAU);C.fill();
-C.fillStyle='#6B3A22';
-C.beginPath();C.ellipse(CX-20,CY+4,7,5.5,0,0,TAU);C.fill();
-C.beginPath();C.ellipse(CX-2,CY+6,6,5,0,0,TAU);C.fill();
-C.strokeStyle='#3A2A1A';C.lineWidth=2;C.beginPath();C.arc(CX-10,CY+7,12,.25,Math.PI-.25);C.stroke();
-C.fillStyle='#5A9E4B';C.font='bold 12px Arial';C.textAlign='center';
-C.fillText('@achpod',CX+22,by+14);
-C.save();C.translate(CX,by+bh-20);C.rotate(-.05);
-C.fillStyle='#5A9E4B';C.fillRect(-bw/2+4,-15,bw-8,32);
-C.fillStyle='#FFF';C.font='bold 12px Arial';
-C.fillText('БЕГАЧ',0,-2);C.fillText('ПОДСЛУШАНО В АЧИНСКЕ',0,12);
-C.restore();C.textAlign='left';C.restore();
+if(LOGO_IMG){
+var ratio=LOGO_IMG.width/LOGO_IMG.height;
+var dw=bw-20,dh=bh-20;
+if(dw/dh>ratio){dw=dh*ratio;}else{dh=dw/ratio;}
+C.drawImage(LOGO_IMG,x+(bw-dw)/2,by+(bh-dh)/2,dw,dh);
+}else{
+C.fillStyle='#5A9E4B';C.fillRect(x+14,by+bh/2-16,bw-28,32);
+}
+C.restore();
 }
 function drawSnowmanPaint(x,scarf){
 var gy=BASE_Y,cx=x+35;
